@@ -41,13 +41,14 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, server
     setGame(new Chess(serverFen));
   }, [serverFen]);
 
-  // TODO: Handle fen from server
   return (
-    <Chessboard
-      id={clientId}
-      position={game.fen()}
-      arePiecesDraggable={isInteractive}
-      onPieceDrop={onDrop}
-    />
+    <div className="Board">
+      <Chessboard
+        id={clientId}
+        position={game.fen()}
+        arePiecesDraggable={isInteractive}
+        onPieceDrop={onDrop}
+      />
+    </div>
   );
 }

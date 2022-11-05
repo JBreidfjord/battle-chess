@@ -43,3 +43,11 @@
   justify-content: center;
   margin: 2em;
 }
+
+.Game {
+  display: flex;
+}
+
+.Board {
+  padding: 2em;
+}

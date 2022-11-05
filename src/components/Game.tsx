@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import Board from "./Board";
-import { ClientMessage } from "../types";
 import { stringToInt } from "../utils";
 import useWebSocket from "react-use-websocket";
 
@@ -33,9 +32,6 @@ export default function Game({ clientId, token }: GameProps) {
       setClientIds(newClientIds);
     }
   }, [lastJsonMessage]);
-
-  // TODO: parse join response into clientIds and create board for each client
-  // If clientId matches our clientId, that board should be interactive
 
   return (
     <div className="Game">

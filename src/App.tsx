@@ -3,15 +3,14 @@ import "./App.css";
 import { useEffect, useState } from "react";
 
 import Board from "./components/Board";
-import reactLogo from "./assets/react.svg";
 import useWebSocket from "react-use-websocket";
 
-const clientId = Date.now().toString(36);
+const clientId = parseInt(Date.now().toFixed(0));
+// TODO: Handle token input
 const token = "test-token";
 
 function App() {
   const socketUrl = `ws://localhost:8000/ws/${clientId}?token=${token}`;
-  const [count, setCount] = useState(0);
 
   const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } =
     useWebSocket(socketUrl, {
@@ -23,21 +22,12 @@ function App() {
   useEffect(() => {
     if (lastJsonMessage) {
       console.log("lastJsonMessage", lastJsonMessage);
-      if ((lastJsonMessage as any).count) {
-        setCount((lastJsonMessage as any).count);
-      }
     }
   }, [lastJsonMessage]);
 
-  const onClick = () => {
-    console.log("sendMessage", count);
-    setCount((count) => count + 1);
-    sendJsonMessage({ count: count + 1 });
-  };
-
   return (
     <div className="App">
-      <Board sendJsonMessage={sendJsonMessage as any} />
+      <Board clientId={clientId} sendJsonMessage={sendJsonMessage as any} />
     </div>
   );
 }

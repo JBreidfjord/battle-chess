@@ -5,7 +5,6 @@ export interface Move {
 }
 
 export interface ClientMessage {
-  clientId?: number;
   move: Move;
 }
 

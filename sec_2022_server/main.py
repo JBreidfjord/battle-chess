@@ -71,7 +71,6 @@ class ConnectionManager:
 
     async def broadcast(self, message: str, token: str):
         """Send a message to all connections with a specific token"""
-        print(self.active_connections)
         for connection in self.active_connections.get(token):
             await connection.send_text(message)
 

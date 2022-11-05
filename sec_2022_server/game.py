@@ -1,12 +1,15 @@
 from chess import (
     BISHOP,
+    BLACK,
     KING,
     KNIGHT,
     PAWN,
     QUEEN,
     ROOK,
+    WHITE,
     Board,
     Move,
+    Piece,
     PieceType,
     engine,
     parse_square,
@@ -74,6 +77,9 @@ class GameManager:
             print(f"No game found for client_id: {client_id}")
             return
 
+        if self.active_games[client_id].turn == WHITE:
+            self.active_games[client_id].turn = BLACK
+
         result = self.engines[client_id].play(self.active_games[client_id], engine.Limit(time=0.1))
         self.active_games[client_id].push(result.move)
         self.turn_count[client_id] -= 1
@@ -91,7 +97,9 @@ class GameManager:
         board_dict = self.active_games[client_id].piece_map()
         for i in range(63, -1, -1):
             if board_dict.get(i) is None:
-                self.active_games[client_id].set_piece_at(i, self.piece_queue[client_id].pop())
+                self.active_games[client_id].set_piece_at(
+                    i, Piece(self.piece_queue[client_id].pop(), BLACK)
+                )
                 break
 
     def get_game_state(self):

@@ -1,4 +1,3 @@
-import threading
 from typing import Union
 
 import uvicorn
@@ -126,9 +125,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
             manager.ai_move(token, client_id)
 
             # TODO: Handle any other game updates here
-
-            # set timer for player
-            # if timer runs out, make AI move
 
             await manager.broadcast_game_state(token)
 

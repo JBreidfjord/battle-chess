@@ -14,8 +14,6 @@ function App() {
     }
   };
 
-  // TODO: Add rules page
-
   return (
     <div className="App">
       {showGame ? (

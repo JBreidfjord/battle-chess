@@ -4,47 +4,6 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
-        <form action="" onsubmit="sendMessage(event)">
-            <label>Token: <input type="text" id="token" autocomplete="off" value="some-key-token"/></label>
-            <button onclick="connect(event)">Connect</button>
-            <hr>
-            <label>Message: <input type="text" id="messageText" autocomplete="off"/></label>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var client_id = Date.now()
-            var token = document.getElementById("token")
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}?token=${token.value}`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
-
 
 class ConnectionManager:
     def __init__(self):
@@ -74,13 +33,18 @@ class ConnectionManager:
         for connection in self.active_connections.get(token):
             await connection.send_text(message)
 
+    async def broadcast_json(self, message: str, token: str):
+        """Send a JSON message to all connections with a specific token"""
+        for connection in self.active_connections.get(token):
+            await connection.send_json(message)
+
 
 manager = ConnectionManager()
 
 
 @app.get("/")
 async def get():
-    return HTMLResponse(html)
+    return HTMLResponse("<h1>TODO: Serve Client!</h1>")
 
 
 async def get_token(websocket: WebSocket, token: str | None = Query(default=None)):
@@ -90,13 +54,21 @@ async def get_token(websocket: WebSocket, token: str | None = Query(default=None
 
 
 @app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int, token: str = Depends(get_token)):
+async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = Depends(get_token)):
     await manager.connect(websocket, token)
     try:
         while True:
-            data = await websocket.receive_text()
-            await manager.send_personal_message(f"You wrote: {data}", websocket)
-            await manager.broadcast(f"Client #{client_id} says: {data}", token)
+            data = await websocket.receive_json()
+            # TODO: Handle any game updates here
+            await manager.broadcast_json(data, token)
+
+            # To handle messaging / chat, we can use:
+            # For specific user:
+            # await manager.send_personal_message(f"Your message here", websocket)
+            # Where websocket is the connection to send to
+            # For all users (in lobby):
+            # await manager.broadcast(f"Your message here", token)
+
     except WebSocketDisconnect:
         manager.disconnect(websocket, token)
         await manager.broadcast(f"Client #{client_id} left the chat", token)

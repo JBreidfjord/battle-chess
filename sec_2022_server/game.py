@@ -20,8 +20,8 @@ class GameManager:
             return
 
         # Update game
-        # Always promotes to queen for simplicity
-        self.active_games[client_id].push(Move.from_uci(f"{move['from']}{move['to']}q"))
+        # TODO: Handle check for promotion
+        self.active_games[client_id].push(Move.from_uci(f"{move['from']}{move['to']}"))
 
     def get_game_state(self):
         return {id: game.fen() for id, game in self.active_games.items()}

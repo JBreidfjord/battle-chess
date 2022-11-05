@@ -61,7 +61,9 @@ class ConnectionManager:
         if not self.active_connections.get(token):
             return
 
-        client_ids = [id for id in self.active_connections[token] if id != "game_manager"]
+        client_ids = [
+            id for id in self.active_connections[token] if id != "game_manager"
+        ]
         self.active_connections[token]["game_manager"] = GameManager(client_ids)
 
     async def broadcast_game_state(self, token: str):
@@ -92,14 +94,18 @@ async def get():
     return HTMLResponse("<h1>TODO: Serve Client!</h1>")
 
 
-async def get_token(websocket: WebSocket, token: Union[str, None] = Query(default=None)):
+async def get_token(
+    websocket: WebSocket, token: Union[str, None] = Query(default=None)
+):
     if token:
         return token
     await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
 
 @app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = Depends(get_token)):
+async def websocket_endpoint(
+    websocket: WebSocket, client_id: str, token: str = Depends(get_token)
+):
     await manager.connect(websocket, token, client_id)
     try:
         # TODO: Handle ready and start messages before initializing game

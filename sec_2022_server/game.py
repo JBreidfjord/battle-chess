@@ -1,16 +1,16 @@
-from chess import QUEEN, Board, Move
+from chess import Board, Move
 
 
 class GameManager:
-    def __init__(self, client_ids: list[int]):
-        self.active_games: dict[int, Board] = {}  # dict[client_id, game]
+    def __init__(self, client_ids: list[str]):
+        self.active_games: dict[str, Board] = {}  # dict[client_id, game]
         for client_id in client_ids:
             self.create_game(client_id)
 
     def create_game(self, client_id: int):
         self.active_games[client_id] = Board()
 
-    def move(self, client_id: int, move: dict[str, str]):
+    def move(self, client_id: str, move: dict[str, str]):
         # Check for input validity
         if not self.active_games.get(client_id):
             print(f"No game found for client_id: {client_id}")

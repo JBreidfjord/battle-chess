@@ -7,9 +7,10 @@ import { useState } from "react";
 interface BoardProps {
   clientId: number;
   sendJsonMessage: (jsonMessage: ClientMessage) => void;
+  isInteractive: boolean;
 }
 
-export default function Board({ clientId, sendJsonMessage }: BoardProps) {
+export default function Board({ clientId, sendJsonMessage, isInteractive }: BoardProps) {
   const [game, setGame] = useState(new Chess()); // TODO: Handle updates to game state
 
   const makeMove = (move: Move) => {
@@ -36,5 +37,12 @@ export default function Board({ clientId, sendJsonMessage }: BoardProps) {
   };
 
   // TODO: Handle fen from server
-  return <Chessboard id={clientId} position={game.fen()} onPieceDrop={onDrop} />;
+  return (
+    <Chessboard
+      id={clientId}
+      position={game.fen()}
+      arePiecesDraggable={isInteractive}
+      onPieceDrop={onDrop}
+    />
+  );
 }

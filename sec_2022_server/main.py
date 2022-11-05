@@ -1,3 +1,5 @@
+from typing import Union
+
 import uvicorn
 from fastapi import Depends, FastAPI, Query, WebSocket, WebSocketDisconnect, status
 from fastapi.responses import HTMLResponse
@@ -11,10 +13,10 @@ app = FastAPI()
 class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[
-            str, dict[int | str, WebSocket | GameManager]
+            str, dict[str, Union[WebSocket, GameManager]]
         ] = {}  # dict[token, dict[client_id | "game_manager", websocket | GameManager]]
 
-    async def connect(self, websocket: WebSocket, token: str, client_id: int):
+    async def connect(self, websocket: WebSocket, token: str, client_id: str):
         """Connect to a room with a specific token"""
         await websocket.accept()
         if self.active_connections.get(token):
@@ -25,7 +27,7 @@ class ConnectionManager:
         # Otherwise, create new token and add connection
         self.active_connections[token] = {client_id: websocket}
 
-    def disconnect(self, token: str, client_id: int):
+    def disconnect(self, token: str, client_id: str):
         """Disconnect a specific connection"""
         if self.active_connections.get(token):
             del self.active_connections[token][client_id]
@@ -72,7 +74,7 @@ class ConnectionManager:
         game_state = self.active_connections[token]["game_manager"].get_game_state()
         await self.broadcast_json(game_state, token)
 
-    def update_game(self, token: str, client_id: int, move: dict[str, str]):
+    def update_game(self, token: str, client_id: str, move: dict[str, str]):
         """Update the game state for a specific client"""
         if not self.active_connections.get(token):
             return
@@ -90,18 +92,20 @@ async def get():
     return HTMLResponse("<h1>TODO: Serve Client!</h1>")
 
 
-async def get_token(websocket: WebSocket, token: str | None = Query(default=None)):
+async def get_token(websocket: WebSocket, token: Union[str, None] = Query(default=None)):
     if token:
         return token
     await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
 
 @app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int, token: str = Depends(get_token)):
+async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = Depends(get_token)):
     await manager.connect(websocket, token, client_id)
     try:
         # TODO: Handle ready and start messages before initializing game
         manager.initialize_game(token)
+
+        await manager.broadcast_game_state(token)
 
         while True:
             data: ClientMessage = await websocket.receive_json()

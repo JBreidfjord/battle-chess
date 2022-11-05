@@ -1,33 +1,39 @@
 import "./App.css";
 
-import { useEffect, useState } from "react";
-
-import Board from "./components/Board";
-import useWebSocket from "react-use-websocket";
-
-const clientId = parseInt(Date.now().toFixed(0));
-// TODO: Handle token input
-const token = "test-token";
+import Game from "./components/Game";
+import { useState } from "react";
 
 function App() {
-  const socketUrl = `ws://localhost:8000/ws/${clientId}?token=${token}`;
+  const [token, setToken] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [showGame, setShowGame] = useState(false);
 
-  const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } =
-    useWebSocket(socketUrl, {
-      onOpen: () => console.log("opened"),
-      // Will attempt to reconnect on all close events, such as server shutting down
-      shouldReconnect: (closeEvent) => true,
-    });
-
-  useEffect(() => {
-    if (lastJsonMessage) {
-      console.log("lastJsonMessage", lastJsonMessage);
+  const joinGame = () => {
+    if (clientId && token) {
+      setShowGame(true);
     }
-  }, [lastJsonMessage]);
+  };
+
+  // TODO: Add rules page
 
   return (
     <div className="App">
-      <Board clientId={clientId} sendJsonMessage={sendJsonMessage as any} />
+      {showGame ? (
+        <Game clientId={clientId} token={token} />
+      ) : (
+        <>
+          <h1>Battle Chess</h1>
+          <div className="room-form">
+            <label>
+              Room Code: <input value={token} onChange={(e) => setToken(e.target.value)} />
+            </label>
+            <label>
+              User ID: <input value={clientId} onChange={(e) => setClientId(e.target.value)} />
+            </label>
+            <button onClick={joinGame}>Join Game</button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -36,6 +36,10 @@
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
+.room-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 2em;
 }

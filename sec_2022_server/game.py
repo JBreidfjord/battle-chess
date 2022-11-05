@@ -18,9 +18,7 @@ from chess.engine import SimpleEngine
 
 
 class GameManager:
-
     queue_pieces: dict[PieceType, PieceType] = {
-        KING: QUEEN,
         QUEEN: ROOK,
         ROOK: BISHOP,
         BISHOP: KNIGHT,
@@ -54,23 +52,27 @@ class GameManager:
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
         possible_moves = self.active_games[client_id].legal_moves
 
-        if moveObj not in possible_moves:
+        if moveObj != Move.null() and moveObj not in possible_moves:
             return
 
         if self.active_games[client_id].is_capture(moveObj):
             removed_piece = self.active_games[client_id].piece_at(parse_square(move["to"]))
-            if removed_piece.piece_type != PAWN:
+            if removed_piece.piece_type != PAWN and removed_piece.piece_type != KING:
                 for id in self.piece_queue.keys():
                     if id == client_id:
-                        continue  # dont put in queue
-
+                        continue  # Don't add to own queue
                     self.piece_queue[client_id].append(self.queue_pieces[removed_piece.piece_type])
-            if removed_piece.piece_type == KING:
-                # TODO: handle reset board
-                ...
 
-        print(self.piece_queue.values())
         self.active_games[client_id].push(moveObj)
+
+        # Check for checkmate
+        if self.active_games[client_id].is_checkmate():
+            for id in self.piece_queue.keys():
+                if id == client_id:
+                    continue  # Don't add to own queue
+                self.piece_queue[client_id].append(QUEEN)
+
+            self.active_games[client_id].reset_board()
 
     def ai_move(self, client_id: str):
         if not self.active_games.get(client_id):
@@ -80,23 +82,28 @@ class GameManager:
         if self.active_games[client_id].turn == WHITE:
             self.active_games[client_id].turn = BLACK
 
-        result = self.engines[client_id].play(self.active_games[client_id], engine.Limit(time=0.1))
+        result = self.engines[client_id].play(
+            self.active_games[client_id], engine.Limit(time=0.05, depth=9)
+        )
         self.active_games[client_id].push(result.move)
+
+        if self.active_games[client_id].is_checkmate():
+            # TODO: Handle player loss
+            ...
+
         self.turn_count[client_id] -= 1
 
         if self.turn_count[client_id] == 0:
             self.spawn_piece(client_id)
             self.turn_count[client_id] = 3
 
-        print("ai move", result.move)
-
     def spawn_piece(self, client_id: str):
         if not self.piece_queue.get(client_id):
             return
 
-        board_dict = self.active_games[client_id].piece_map()
+        # Search for first empty square to spawn piece
         for i in range(63, -1, -1):
-            if board_dict.get(i) is None:
+            if not self.active_games[client_id].piece_at(i):
                 self.active_games[client_id].set_piece_at(
                     i, Piece(self.piece_queue[client_id].pop(), BLACK)
                 )

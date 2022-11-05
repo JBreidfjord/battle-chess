@@ -31,7 +31,8 @@ class GameManager:
             print(f"Invalid move: {move}")
             return
 
-        moveObj = Move.from_uci(f"{move['from']}{move['to']}q")
+        # TODO: Handle check for promotion
+        moveObj = Move.from_uci(f"{move['from']}{move['to']}")
         if self.active_games[client_id].is_capture(moveObj):
             removed_piece = self.active_games[client_id].piece_at(move["to"])
             if removed_piece.piece_type != PAWN:
@@ -44,8 +45,6 @@ class GameManager:
                 # TODO: add reset board
                 ...
 
-        # Update game
-        # Always promotes to queen for simplicity
         # print(self.piece_queue.values())
         self.active_games[client_id].push(moveObj)
 

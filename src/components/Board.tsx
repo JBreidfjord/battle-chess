@@ -1,17 +1,18 @@
 import { ClientMessage, Move } from "../types";
+import { useEffect, useState } from "react";
 
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-import { useState } from "react";
 
 interface BoardProps {
   clientId: number;
   sendJsonMessage: (jsonMessage: ClientMessage) => void;
   isInteractive: boolean;
+  serverFen?: string;
 }
 
-export default function Board({ clientId, sendJsonMessage, isInteractive }: BoardProps) {
-  const [game, setGame] = useState(new Chess()); // TODO: Handle updates to game state
+export default function Board({ clientId, sendJsonMessage, isInteractive, serverFen }: BoardProps) {
+  const [game, setGame] = useState(new Chess(serverFen)); // TODO: Handle updates to game state
 
   const makeMove = (move: Move) => {
     const gameCopy = new Chess(game.fen());
@@ -36,13 +37,18 @@ export default function Board({ clientId, sendJsonMessage, isInteractive }: Boar
     return true;
   };
 
-  // TODO: Handle fen from server
+  useEffect(() => {
+    setGame(new Chess(serverFen));
+  }, [serverFen]);
+
   return (
-    <Chessboard
-      id={clientId}
-      position={game.fen()}
-      arePiecesDraggable={isInteractive}
-      onPieceDrop={onDrop}
-    />
+    <div className="Board">
+      <Chessboard
+        id={clientId}
+        position={game.fen()}
+        arePiecesDraggable={isInteractive}
+        onPieceDrop={onDrop}
+      />
+    </div>
   );
 }

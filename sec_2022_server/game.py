@@ -31,7 +31,7 @@ class GameManager:
         for client_id in client_ids:
             self.create_game(client_id)
 
-    def create_game(self, client_id: int):
+    def create_game(self, client_id: str):
         self.turn_count[client_id] = 3
         self.active_games[client_id] = Board()
         self.piece_queue[client_id] = []
@@ -42,36 +42,39 @@ class GameManager:
             print(f"No game found for client_id: {client_id}")
             return
         if not move.get("from") or not move.get("to"):
-            print(f"Invalid move: {move}")
+            print(f"Invalid move: {move} for client_id: {client_id}")
             return
 
         # TODO: Handle check for promotion
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
 
         if moveObj == Move.null():
+            self.active_games[client_id].turn = BLACK  # Switch to AI turn
             return
 
         possible_moves = self.active_games[client_id].legal_moves
         if moveObj not in possible_moves:
-            print(f"WARN: Invalid move {moveObj} for {client_id}")
+            print(f"WARN: Invalid move {moveObj} for client_id: {client_id}")
             return
 
-        if self.active_games[client_id].is_capture(moveObj):
-            removed_piece = self.active_games[client_id].piece_at(parse_square(move["to"]))
+        # Check if move is a capture and therefore removes a piece
+        removed_piece = self.active_games[client_id].piece_at(parse_square(move["to"]))
+        if removed_piece is not None:
+            # Add piece to other player's queue
             if removed_piece.piece_type != PAWN and removed_piece.piece_type != KING:
-                for id in self.piece_queue.keys():
-                    if id == client_id:
+                for other_id in self.piece_queue.keys():
+                    if other_id == client_id:
                         continue  # Don't add to own queue
-                    self.piece_queue[client_id].append(self.queue_pieces[removed_piece.piece_type])
+                    self.piece_queue[other_id].append(self.queue_pieces[removed_piece.piece_type])
 
         self.active_games[client_id].push(moveObj)
 
         # Check for checkmate
         if self.active_games[client_id].is_checkmate():
-            for id in self.piece_queue.keys():
-                if id == client_id:
+            for other_id in self.piece_queue.keys():
+                if other_id == client_id:
                     continue  # Don't add to own queue
-                self.piece_queue[client_id].append(QUEEN)
+                self.piece_queue[other_id].append(QUEEN)
 
             self.active_games[client_id].reset_board()
 
@@ -92,13 +95,16 @@ class GameManager:
             )
         except chess.engine.EngineTerminatedError:
             print("WARN: Engine terminated")
+            return
         except chess.engine.EngineError as e:
             print(f"ERROR: Engine error: {e}")
+            return
 
         await engine.quit()
 
         if result.move is None:
             print("WARN: AI returned None move")
+            return
 
         self.active_games[client_id].push(result.move)
 

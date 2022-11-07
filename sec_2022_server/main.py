@@ -83,14 +83,14 @@ class ConnectionManager:
 
         self.active_connections[token]["game_manager"].move(client_id, move)
 
-    def ai_move(self, token: str, client_id: str):
+    async def ai_move(self, token: str, client_id: str):
         """Make an AI move for a specific client"""
         if not self.active_connections.get(token):
             return
         if not self.active_connections[token].get("game_manager"):
             return
 
-        self.active_connections[token]["game_manager"].ai_move(client_id)
+        await self.active_connections[token]["game_manager"].ai_move(client_id)
 
 
 manager = ConnectionManager()
@@ -122,7 +122,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
             manager.update_game(token, client_id, data["move"])
 
             # Make AI move
-            manager.ai_move(token, client_id)
+            await manager.ai_move(token, client_id)
 
             # TODO: Handle any other game updates here
 

@@ -1,3 +1,4 @@
+import chess.engine
 from chess import (
     BISHOP,
     BLACK,
@@ -11,10 +12,8 @@ from chess import (
     Move,
     Piece,
     PieceType,
-    engine,
     parse_square,
 )
-from chess.engine import SimpleEngine
 
 
 class GameManager:
@@ -29,7 +28,6 @@ class GameManager:
         self.turn_count: dict[str, int] = {}
         self.piece_queue: dict[str, list[PieceType]] = {}
         self.active_games: dict[str, Board] = {}  # dict[client_id, game]
-        self.engines: dict[str, SimpleEngine] = {}
         for client_id in client_ids:
             self.create_game(client_id)
 
@@ -37,7 +35,6 @@ class GameManager:
         self.turn_count[client_id] = 3
         self.active_games[client_id] = Board()
         self.piece_queue[client_id] = []
-        self.engines[client_id] = engine.SimpleEngine.popen_uci("/opt/homebrew/bin/stockfish")
 
     def move(self, client_id: str, move: dict[str, str]):
         # Check for input validity
@@ -74,17 +71,26 @@ class GameManager:
 
             self.active_games[client_id].reset_board()
 
-    def ai_move(self, client_id: str):
+    async def ai_move(self, client_id: str):
         if not self.active_games.get(client_id):
             print(f"No game found for client_id: {client_id}")
             return
 
         if self.active_games[client_id].turn == WHITE:
+            print("WARN: AI tried moving on White turn")
             self.active_games[client_id].turn = BLACK
 
-        result = self.engines[client_id].play(
-            self.active_games[client_id], engine.Limit(time=0.05, depth=9)
+        _, engine = await chess.engine.popen_uci("/opt/homebrew/bin/stockfish")
+
+        result = await engine.play(
+            self.active_games[client_id], chess.engine.Limit(time=0.05, depth=9)
         )
+
+        await engine.quit()
+
+        if result.move is None:
+            print("WARN: AI returned None move")
+
         self.active_games[client_id].push(result.move)
 
         if self.active_games[client_id].is_checkmate():

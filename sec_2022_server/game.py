@@ -110,6 +110,7 @@ class GameManager:
 
         if self.active_games[client_id].is_checkmate():
             # TODO: Handle player loss
+            print(f"Checkmate against {client_id}")
             ...
 
         self.turn_count[client_id] -= 1

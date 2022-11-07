@@ -47,9 +47,13 @@ class GameManager:
 
         # TODO: Handle check for promotion
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
-        possible_moves = self.active_games[client_id].legal_moves
 
-        if moveObj != Move.null() and moveObj not in possible_moves:
+        if moveObj == Move.null():
+            return
+
+        possible_moves = self.active_games[client_id].legal_moves
+        if moveObj not in possible_moves:
+            print(f"WARN: Invalid move {moveObj} for {client_id}")
             return
 
         if self.active_games[client_id].is_capture(moveObj):
@@ -82,9 +86,14 @@ class GameManager:
 
         _, engine = await chess.engine.popen_uci("/opt/homebrew/bin/stockfish")
 
-        result = await engine.play(
-            self.active_games[client_id], chess.engine.Limit(time=0.05, depth=9)
-        )
+        try:
+            result = await engine.play(
+                self.active_games[client_id], chess.engine.Limit(time=0.05, depth=9)
+            )
+        except chess.engine.EngineTerminatedError:
+            print("WARN: Engine terminated")
+        except chess.engine.EngineError as e:
+            print(f"ERROR: Engine error: {e}")
 
         await engine.quit()
 

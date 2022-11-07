@@ -44,7 +44,10 @@ class ConnectionManager:
         for (id, connection) in self.active_connections.get(token).items():
             if id == "game_manager":
                 continue
-            await connection.send_text(message)
+            try:
+                await connection.send_text(message)
+            except RuntimeError:
+                print("WARN: Tried to send text to closed connection")
 
     async def broadcast_json(self, message: str, token: str):
         """Send a JSON message to all connections with a specific token"""
@@ -54,7 +57,10 @@ class ConnectionManager:
         for (id, connection) in self.active_connections.get(token).items():
             if id == "game_manager":
                 continue
-            await connection.send_json(message)
+            try:
+                await connection.send_json(message)
+            except RuntimeError:
+                print("WARN: Tried to send JSON to closed connection")
 
     def initialize_game(self, token: str):
         """Initialize a new game"""

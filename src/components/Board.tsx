@@ -41,13 +41,6 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, server
     setGame(new Chess(serverFen));
   }, [serverFen]);
 
-  useEffect(() => {
-    let timeoutHandler = setTimeout(() => {
-      sendJsonMessage({ move: { from: "00", to: "00" } });
-    }, 7500);
-    return () => clearTimeout(timeoutHandler);
-  }, [serverFen]);
-
   return (
     <div className="Board">
       <Chessboard

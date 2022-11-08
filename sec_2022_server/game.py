@@ -1,3 +1,5 @@
+import asyncio
+
 import chess.engine
 from chess import (
     BISHOP,
@@ -25,8 +27,14 @@ class GameManager:
     }
 
     def __init__(self, client_ids: list[str]):
+        self.started = False
+        self.turn_time = 7.5  # Seconds
+
+        self._loop = asyncio.get_event_loop()
+
         self.turn_count: dict[str, int] = {}
         self.piece_queue: dict[str, list[PieceType]] = {}
+        self.move_timer_handlers: dict[str, asyncio.TimerHandle] = {}
         self.active_games: dict[str, Board] = {}  # dict[client_id, game]
         for client_id in client_ids:
             self.create_game(client_id)
@@ -36,6 +44,12 @@ class GameManager:
         self.active_games[client_id] = Board()
         self.piece_queue[client_id] = []
 
+    def start(self):
+        self.started = True
+        # Start timers for each client
+        for client_id in self.active_games.keys():
+            self.set_move_timer(client_id)
+
     def move(self, client_id: str, move: dict[str, str]):
         # Check for input validity
         if not self.active_games.get(client_id):
@@ -44,6 +58,8 @@ class GameManager:
         if not move.get("from") or not move.get("to"):
             print(f"Invalid move: {move} for client_id: {client_id}")
             return
+
+        self.move_timer_handlers[client_id].cancel()
 
         # TODO: Handle check for promotion
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
@@ -77,6 +93,11 @@ class GameManager:
                 self.piece_queue[other_id].append(QUEEN)
 
             self.active_games[client_id].reset_board()
+
+    def set_move_timer(self, client_id: str):
+        self.move_timer_handlers[client_id] = self._loop.call_later(
+            self.turn_time, self.ai_move, client_id
+        )
 
     async def ai_move(self, client_id: str):
         if not self.active_games.get(client_id):
@@ -132,4 +153,15 @@ class GameManager:
                 break
 
     def get_game_state(self):
-        return {id: game.fen() for id, game in self.active_games.items()}
+        state = {
+            "started": self.started,
+            "clients": {
+                id: {
+                    # Extra attributes can be added here
+                    "fen": game.fen(),
+                }
+                for id, game in self.active_games.items()
+            },
+        }
+
+        return state

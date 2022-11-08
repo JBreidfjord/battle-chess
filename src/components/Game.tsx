@@ -9,39 +9,56 @@ interface GameProps {
   token: string;
 }
 
+const defaultClient = {
+  id: "",
+  fen: "start",
+};
+
 export default function Game({ clientId, token }: GameProps) {
-  const [clientIds, setClientIds] = useState<string[]>([clientId, "", "", ""]);
+  const [clients, setClients] = useState([
+    { id: clientId, fen: "start" },
+    defaultClient,
+    defaultClient,
+    defaultClient,
+  ]);
+  const [hasStarted, setHasStarted] = useState(false);
   const socketUrl = `ws://localhost:8000/ws/${clientId}?token=${token}`;
+
+  const handleMessage = (event: MessageEvent) => {
+    console.log("event", event);
+    // TODO: Add types for messages
+    const message = JSON.parse(event.data);
+    const newClients = [];
+    for (const [id, client] of Object.entries(message["clients"])) {
+      // Check for ID match so our client is at the start of the array
+      if (id === clientId) {
+        // Insert at start of array
+        newClients.unshift({ id, fen: (client as any)["fen"] });
+      } else {
+        // Insert at end of array
+        newClients.push({ id, fen: (client as any)["fen"] });
+      }
+    }
+    setClients(newClients);
+  };
 
   const { sendMessage, sendJsonMessage, lastMessage, lastJsonMessage, readyState, getWebSocket } =
     useWebSocket(socketUrl, {
       onOpen: () => console.log("opened"),
+      onMessage: handleMessage,
       // Will attempt to reconnect on all close events, such as server shutting down
       shouldReconnect: (closeEvent) => true,
     });
 
-  useEffect(() => {
-    if (lastJsonMessage) {
-      console.log("lastJsonMessage", lastJsonMessage);
-      // Update clientIds from server
-      const newClientIds = [clientId];
-      for (const id of Object.keys(lastJsonMessage)) {
-        if (id == clientId) continue; // Don't update our own id, we know it
-        newClientIds.push(id);
-      }
-      setClientIds(newClientIds);
-    }
-  }, [lastJsonMessage]);
-
   return (
     <div className="Game">
-      {clientIds.map((id, index) => (
+      {clients.map((client, index) => (
         <Board
-          key={id || index}
-          clientId={stringToInt(id) || -1}
+          key={client.id || index}
+          clientId={stringToInt(client.id) || -1}
           sendJsonMessage={sendJsonMessage as any}
-          isInteractive={id === clientId}
-          serverFen={lastJsonMessage ? (lastJsonMessage as any)[id] : undefined}
+          isInteractive={hasStarted && client.id === clientId}
+          serverFen={client.fen}
         />
       ))}
     </div>

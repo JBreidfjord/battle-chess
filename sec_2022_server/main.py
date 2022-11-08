@@ -24,6 +24,15 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
 
         await manager.broadcast_game_state(token)
 
+        # Lobby / Pre-game loop
+        while not manager.game_managers[token].started:
+            message = await websocket.receive_text()
+            if message == "start":
+                manager.game_managers[token].start()
+                await manager.broadcast_game_state(token)
+                break
+
+        # Game loop
         while True:
             data: ClientMessage = await websocket.receive_json()
 

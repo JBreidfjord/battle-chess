@@ -46,6 +46,11 @@
 
 .Game {
   display: flex;
+  flex-direction: column;
+}
+
+.board-container {
+  display: flex;
 }
 
 .Board {

@@ -12,7 +12,7 @@ interface BoardProps {
 }
 
 export default function Board({ clientId, sendJsonMessage, isInteractive, serverFen }: BoardProps) {
-  const [game, setGame] = useState(new Chess(serverFen)); // TODO: Handle updates to game state
+  const [game, setGame] = useState(new Chess(serverFen));
 
   const makeMove = (move: Move) => {
     const gameCopy = new Chess(game.fen());

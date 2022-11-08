@@ -11,12 +11,12 @@ interface GameProps {
 
 const defaultClient = {
   id: "",
-  fen: "start",
+  fen: "",
 };
 
 export default function Game({ clientId, token }: GameProps) {
   const [clients, setClients] = useState([
-    { id: clientId, fen: "start" },
+    { id: clientId, fen: "" },
     defaultClient,
     defaultClient,
     defaultClient,
@@ -25,9 +25,9 @@ export default function Game({ clientId, token }: GameProps) {
   const socketUrl = `ws://localhost:8000/ws/${clientId}?token=${token}`;
 
   const handleMessage = (event: MessageEvent) => {
-    console.log("event", event);
     // TODO: Add types for messages
     const message = JSON.parse(event.data);
+    console.log("message", message);
     const newClients = [];
     for (const [id, client] of Object.entries(message["clients"])) {
       // Check for ID match so our client is at the start of the array
@@ -58,7 +58,7 @@ export default function Game({ clientId, token }: GameProps) {
           clientId={stringToInt(client.id) || -1}
           sendJsonMessage={sendJsonMessage as any}
           isInteractive={hasStarted && client.id === clientId}
-          serverFen={client.fen}
+          serverFen={client.fen || undefined}
         />
       ))}
     </div>

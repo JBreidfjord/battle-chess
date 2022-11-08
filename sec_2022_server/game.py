@@ -96,7 +96,7 @@ class GameManager:
 
     def set_move_timer(self, client_id: str):
         self.move_timer_handlers[client_id] = self._loop.call_later(
-            self.turn_time, self.ai_move, client_id
+            self.turn_time, self._loop.create_task, self.ai_move(client_id)
         )
 
     async def ai_move(self, client_id: str):

@@ -36,6 +36,7 @@ class GameManager:
         self.piece_queue: dict[str, list[PieceType]] = {}
         self.move_timer_handles: dict[str, asyncio.TimerHandle] = {}
         self.active_games: dict[str, Board] = {}  # dict[client_id, game]
+        self.ready_states: dict[str, bool] = {}  # dict[client_id, ready_state]
         for client_id in client_ids:
             self.create_game(client_id)
 
@@ -43,8 +44,13 @@ class GameManager:
         self.turn_count[client_id] = 3
         self.active_games[client_id] = Board()
         self.piece_queue[client_id] = []
+        self.ready_states[client_id] = False
 
     async def start(self):
+        # Skip if already started
+        if self.started:
+            return
+
         self.started = True
         # Start timers for each client
         for client_id in self.active_games.keys():
@@ -153,6 +159,9 @@ class GameManager:
                 )
                 break
 
+    def ready(self, client_id: str, ready: bool = True):
+        self.ready_states[client_id] = ready
+
     def get_game_state(self):
         state = {
             "started": self.started,
@@ -160,6 +169,7 @@ class GameManager:
                 id: {
                     # Extra attributes can be added here
                     "fen": game.fen(),
+                    "ready": self.ready_states[id],
                 }
                 for id, game in self.active_games.items()
             },

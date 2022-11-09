@@ -27,10 +27,18 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
         # Lobby / Pre-game loop
         while not manager.game_managers[token].started:
             message = await websocket.receive_text()
+
+            if message in ["ready", "unready"]:
+                manager.game_managers[token].ready(client_id, ready=message == "ready")
+                await manager.broadcast_game_state(token)
+                continue
+
             if message == "start":
                 await manager.game_managers[token].start()
                 await manager.broadcast_game_state(token)
                 break
+
+            print(f"WARN: Unknown message '{message}' in lobby for client_id '{client_id}'")
 
         # Game loop
         while True:

@@ -11,11 +11,12 @@ interface GameProps {
 const defaultClient = {
   id: "",
   fen: "",
+  ready: false,
 };
 
 export default function Game({ clientId, token }: GameProps) {
   const [clients, setClients] = useState([
-    { id: clientId, fen: "" },
+    { id: clientId, fen: "", ready: false },
     defaultClient,
     defaultClient,
     defaultClient,
@@ -37,10 +38,10 @@ export default function Game({ clientId, token }: GameProps) {
       // Check for ID match so our client is at the start of the array
       if (id === clientId) {
         // Insert at start of array
-        newClients.unshift({ id, fen: (client as any)["fen"] });
+        newClients.unshift({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
       } else {
         // Insert at end of array
-        newClients.push({ id, fen: (client as any)["fen"] });
+        newClients.push({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
       }
     }
     setClients(newClients);
@@ -57,20 +58,36 @@ export default function Game({ clientId, token }: GameProps) {
     sendMessage("start");
   };
 
+  const onReadyToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    sendMessage(e.target.checked ? "ready" : "unready");
+  };
+
   return (
     <div className="Game">
       <div className="board-container">
         {clients.map((client, index) => (
-          <Board
-            key={client.id || index}
-            clientId={stringToInt(client.id) || -1}
-            sendJsonMessage={sendJsonMessage as any}
-            isInteractive={hasStarted && client.id === clientId}
-            serverFen={client.fen || undefined}
-          />
+          <div className="board-with-toggle" key={client.id || index}>
+            <Board
+              key={client.id || index}
+              clientId={stringToInt(client.id) || -1}
+              sendJsonMessage={sendJsonMessage as any}
+              isInteractive={hasStarted && client.id === clientId}
+              serverFen={client.fen || undefined}
+            />
+            {!hasStarted &&
+              (client.id === clientId ? (
+                <input type="checkbox" checked={client.ready} onChange={onReadyToggle} />
+              ) : (
+                <input type="checkbox" disabled checked={client.ready} />
+              ))}
+          </div>
         ))}
       </div>
-      {!hasStarted && <button onClick={onStartClick}>Start</button>}
+      {!hasStarted && (
+        <button onClick={onStartClick} disabled={clients.some((c) => !c.ready)}>
+          Start
+        </button>
+      )}
     </div>
   );
 }

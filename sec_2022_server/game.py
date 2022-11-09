@@ -34,7 +34,7 @@ class GameManager:
 
         self.turn_count: dict[str, int] = {}
         self.piece_queue: dict[str, list[PieceType]] = {}
-        self.move_timer_handlers: dict[str, asyncio.TimerHandle] = {}
+        self.move_timer_handles: dict[str, asyncio.TimerHandle] = {}
         self.active_games: dict[str, Board] = {}  # dict[client_id, game]
         for client_id in client_ids:
             self.create_game(client_id)
@@ -44,11 +44,11 @@ class GameManager:
         self.active_games[client_id] = Board()
         self.piece_queue[client_id] = []
 
-    def start(self):
+    async def start(self):
         self.started = True
         # Start timers for each client
         for client_id in self.active_games.keys():
-            self.set_move_timer(client_id)
+            await self.set_move_timer(client_id)
 
     def move(self, client_id: str, move: dict[str, str]):
         # Check for input validity
@@ -59,19 +59,15 @@ class GameManager:
             print(f"Invalid move: {move} for client_id: {client_id}")
             return
 
-        self.move_timer_handlers[client_id].cancel()
-
         # TODO: Handle check for promotion
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
-
-        if moveObj == Move.null():
-            self.active_games[client_id].turn = BLACK  # Switch to AI turn
-            return
 
         possible_moves = self.active_games[client_id].legal_moves
         if moveObj not in possible_moves:
             print(f"WARN: Invalid move {moveObj} for client_id: {client_id}")
             return
+
+        self.move_timer_handles[client_id].cancel()
 
         # Check if move is a capture and therefore removes a piece
         removed_piece = self.active_games[client_id].piece_at(parse_square(move["to"]))
@@ -94,11 +90,6 @@ class GameManager:
 
             self.active_games[client_id].reset_board()
 
-    def set_move_timer(self, client_id: str):
-        self.move_timer_handlers[client_id] = self._loop.call_later(
-            self.turn_time, self._loop.create_task, self.ai_move(client_id)
-        )
-
     async def ai_move(self, client_id: str):
         if not self.active_games.get(client_id):
             print(f"No game found for client_id: {client_id}")
@@ -107,9 +98,12 @@ class GameManager:
         if self.active_games[client_id].turn == WHITE:
             print("WARN: AI tried moving on White turn")
             self.active_games[client_id].turn = BLACK
+            # Clear move stack to prevent engine errors
+            self.active_games[client_id].clear_stack()
 
         _, engine = await chess.engine.popen_uci("/opt/homebrew/bin/stockfish")
 
+        # TODO: Better handling of engine errors
         try:
             result = await engine.play(
                 self.active_games[client_id], chess.engine.Limit(time=0.05, depth=9)
@@ -139,6 +133,13 @@ class GameManager:
         if self.turn_count[client_id] == 0:
             self.spawn_piece(client_id)
             self.turn_count[client_id] = 3
+
+        await self.set_move_timer(client_id)
+
+    async def set_move_timer(self, client_id: str):
+        self.move_timer_handles[client_id] = self._loop.call_later(
+            self.turn_time, self._loop.create_task, self.ai_move(client_id)
+        )
 
     def spawn_piece(self, client_id: str):
         if not self.piece_queue.get(client_id):

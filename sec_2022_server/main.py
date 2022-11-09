@@ -28,7 +28,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
         while not manager.game_managers[token].started:
             message = await websocket.receive_text()
             if message == "start":
-                manager.game_managers[token].start()
+                await manager.game_managers[token].start()
                 await manager.broadcast_game_state(token)
                 break
 
@@ -58,4 +58,4 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", reload=True)

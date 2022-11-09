@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-
 import Board from "./Board";
 import { stringToInt } from "../utils";
+import { useState } from "react";
 import useWebSocket from "react-use-websocket";
 
 interface GameProps {
@@ -22,8 +21,7 @@ export default function Game({ clientId, token }: GameProps) {
     defaultClient,
   ]);
   const [hasStarted, setHasStarted] = useState(false);
-
-  const socketUrl = `ws://localhost:8000/ws/${clientId}?token=${token}`;
+  const socketUrl = `ws://${window.location.hostname}:8000/ws/${clientId}?token=${token}`;
 
   const onMessage = (event: MessageEvent) => {
     // TODO: Add types for messages

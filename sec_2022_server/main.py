@@ -1,3 +1,5 @@
+import asyncio
+
 import uvicorn
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
@@ -26,7 +28,11 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str, token: str = 
 
         # Lobby / Pre-game loop
         while not manager.game_managers[token].started:
-            message = await websocket.receive_text()
+            # Timeout after 1 second to check if game has started by another client
+            try:
+                message = await asyncio.wait_for(websocket.receive_text(), timeout=1)
+            except asyncio.TimeoutError:
+                continue
 
             if message in ["ready", "unready"]:
                 manager.game_managers[token].ready(client_id, ready=message == "ready")

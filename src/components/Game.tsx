@@ -27,7 +27,7 @@ export default function Game({ clientId, token }: GameProps) {
   const onMessage = (event: MessageEvent) => {
     // TODO: Add types for messages
     const message = JSON.parse(event.data);
-    console.log("message", message);
+    // console.log("message", message);
 
     if (message["started"]) {
       setHasStarted(true);
@@ -74,17 +74,27 @@ export default function Game({ clientId, token }: GameProps) {
               isInteractive={hasStarted && client.id === clientId}
               serverFen={client.fen || undefined}
             />
-            {!hasStarted &&
-              (client.id === clientId ? (
-                <input type="checkbox" checked={client.ready} onChange={onReadyToggle} />
-              ) : (
-                <input type="checkbox" disabled checked={client.ready} />
-              ))}
+            {!hasStarted && (
+              <div className={`ready-toggle ${client.ready ? "checked" : ""}`}>
+                <label className={client.id === clientId ? "interactive" : ""}>
+                  {client.ready ? "Ready" : "Not Ready"}
+                  {client.id === clientId ? (
+                    <input type="checkbox" checked={client.ready} onChange={onReadyToggle} />
+                  ) : (
+                    <input type="checkbox" disabled checked={client.ready} />
+                  )}
+                </label>
+              </div>
+            )}
           </div>
         ))}
       </div>
       {!hasStarted && (
-        <button onClick={onStartClick} disabled={clients.some((c) => !c.ready)}>
+        <button
+          onClick={onStartClick}
+          disabled={clients.some((c) => !c.ready)}
+          className="start-button"
+        >
           Start
         </button>
       )}

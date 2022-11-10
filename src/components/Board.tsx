@@ -12,7 +12,7 @@ interface BoardProps {
 }
 
 export default function Board({ clientId, sendJsonMessage, isInteractive, serverFen }: BoardProps) {
-  const [game, setGame] = useState(new Chess(serverFen)); // TODO: Handle updates to game state
+  const [game, setGame] = useState(new Chess(serverFen));
 
   const makeMove = (move: Move) => {
     const gameCopy = new Chess(game.fen());
@@ -39,13 +39,6 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, server
 
   useEffect(() => {
     setGame(new Chess(serverFen));
-  }, [serverFen]);
-
-  useEffect(() => {
-    let timeoutHandler = setTimeout(() => {
-      sendJsonMessage({ move: { from: "00", to: "00" } });
-    }, 7500);
-    return () => clearTimeout(timeoutHandler);
   }, [serverFen]);
 
   return (

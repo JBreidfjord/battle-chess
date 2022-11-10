@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Press Start 2P", Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
@@ -13,6 +13,12 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("/src/assets/fonts/PressStart2P-Regular.ttf") format("truetype");
+  font-display: block;
 }
 
 a {
@@ -49,11 +55,14 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #88f7e2;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+button:disabled {
+  cursor: default;
 }
 
 @media (prefers-color-scheme: light) {
@@ -62,7 +71,7 @@ button:focus-visible {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
+    color: #88f7e2;
   }
   button {
     background-color: #f9f9f9;

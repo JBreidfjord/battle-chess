@@ -70,7 +70,6 @@
 .ready-toggle {
   text-transform: uppercase;
   font-size: 1.5em;
-  padding: 0.5em 1em;
   margin: 1em;
   color: #fa233e;
 }
@@ -85,4 +84,13 @@
 
 .ready-toggle input[type="checkbox"] {
   display: none;
+}
+
+.start-button {
+  border: none;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  background-color: transparent;
+  cursor: pointer;
+  transition: none;
 }

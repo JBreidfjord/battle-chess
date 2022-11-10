@@ -3,7 +3,7 @@ from typing import Union
 
 from fastapi import WebSocket
 
-from battle_chess.game import GameManager
+from battle_chess.game_manager import GameManager
 
 
 class ConnectionManager:

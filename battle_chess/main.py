@@ -4,9 +4,9 @@ import uvicorn
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-from sec_2022_server.connection_manager import ConnectionManager
-from sec_2022_server.dependencies import get_token
-from sec_2022_server.type_defs import ClientMessage
+from battle_chess.connection_manager import ConnectionManager
+from battle_chess.dependencies import get_token
+from battle_chess.type_defs import ClientMessage
 
 app = FastAPI()
 manager = ConnectionManager()

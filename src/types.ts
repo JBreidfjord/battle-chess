@@ -13,6 +13,7 @@ export interface StateUpdate {
   ready: boolean;
   moveTime: number;
   queue: number[];
+  queueCountdown: number;
 }
 
 export type ClientState = StateUpdate & {

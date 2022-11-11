@@ -1,3 +1,7 @@
-export default function PieceQueueCountdown() {
-  return <div className="piece-queue-countdown" style={{ width: "100%", height: "1em" }} />;
+interface PieceQueueCountdownProps {
+  count: number;
+}
+
+export default function PieceQueueCountdown({ count }: PieceQueueCountdownProps) {
+  return <div className="piece-queue-countdown">{count}</div>;
 }

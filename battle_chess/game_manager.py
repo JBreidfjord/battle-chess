@@ -165,7 +165,7 @@ class GameManager:
         for i in range(63, -1, -1):
             if not self.active_games[client_id].piece_at(i):
                 self.active_games[client_id].set_piece_at(
-                    i, Piece(self.piece_queue[client_id].pop(), BLACK)
+                    i, Piece(self.piece_queue[client_id].pop(0), BLACK)
                 )
                 break
 
@@ -186,6 +186,8 @@ class GameManager:
                 # Extra client attributes can be added here
                 "fen": game.fen(),
                 "ready": self.ready_states[id],
+                "queue": self.piece_queue[id],
+                "queueCountdown": self.turn_count[id],
             }
 
             # Move time is sent as a timestamp since epoch,

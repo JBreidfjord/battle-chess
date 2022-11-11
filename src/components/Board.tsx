@@ -106,7 +106,7 @@ export default function Board({
   return (
     <div className="Board">
       <PieceQueue queue={state.queue} />
-      <PieceQueueCountdown />
+      <PieceQueueCountdown count={state.queueCountdown} />
       <MoveTimer time={state.moveTime} maxTime={maxTurnTime} />
       <div className="Board__chessboard">
         <Chessboard

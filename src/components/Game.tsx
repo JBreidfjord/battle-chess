@@ -16,6 +16,7 @@ const defaultClientState: ClientState = {
   ready: false,
   moveTime: 0.0,
   queue: [],
+  queueCountdown: 3,
 };
 
 export default function Game({ clientId, token }: GameProps) {

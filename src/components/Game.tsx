@@ -1,3 +1,5 @@
+import { ClientState, StateUpdate } from "../types";
+
 import Board from "./Board";
 import { stringToInt } from "../utils";
 import { useState } from "react";
@@ -8,20 +10,22 @@ interface GameProps {
   token: string;
 }
 
-const defaultClient = {
+const defaultClientState: ClientState = {
   id: "",
-  fen: "",
+  fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   ready: false,
+  moveTime: 0.0,
 };
 
 export default function Game({ clientId, token }: GameProps) {
-  const [clients, setClients] = useState([
-    { id: clientId, fen: "", ready: false },
-    defaultClient,
-    defaultClient,
-    defaultClient,
+  const [clientStates, setClientStates] = useState([
+    { ...defaultClientState, id: clientId },
+    defaultClientState,
+    defaultClientState,
+    defaultClientState,
   ]);
   const [hasStarted, setHasStarted] = useState(false);
+  const [turnTime, setTurnTime] = useState(7.5);
   const socketUrl = `ws://${window.location.hostname}:8000/ws/${clientId}?token=${token}`;
 
   const onMessage = (event: MessageEvent) => {
@@ -33,18 +37,17 @@ export default function Game({ clientId, token }: GameProps) {
       setHasStarted(true);
     }
 
-    const newClients = [];
-    for (const [id, client] of Object.entries(message["clients"])) {
-      // Check for ID match so our client is at the start of the array
-      if (id === clientId) {
-        // Insert at start of array
-        newClients.unshift({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
-      } else {
-        // Insert at end of array
-        newClients.push({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
-      }
+    if (message["turnTime"] && message["turnTime"] !== turnTime) {
+      setTurnTime(message["turnTime"]);
     }
-    setClients(newClients);
+
+    const newStates = [];
+    for (const [id, state] of Object.entries<StateUpdate>(message["clients"])) {
+      const newState = { ...state, id };
+      // Check for ID match so our client is at the start of the array
+      id === clientId ? newStates.unshift(newState) : newStates.push(newState);
+    }
+    setClientStates(newStates);
   };
 
   const { sendMessage, sendJsonMessage } = useWebSocket(socketUrl, {
@@ -65,14 +68,15 @@ export default function Game({ clientId, token }: GameProps) {
   return (
     <div className="Game">
       <div className="board-container">
-        {clients.map((client, index) => (
+        {clientStates.map((client, index) => (
           <div className="board-with-toggle" key={client.id || index}>
             <Board
               key={client.id || index}
               clientId={stringToInt(client.id) || -1}
               sendJsonMessage={sendJsonMessage as any}
               isInteractive={hasStarted && client.id === clientId}
-              serverFen={client.fen || undefined}
+              state={client}
+              maxTurnTime={turnTime}
             />
             {!hasStarted && (
               <div className={`ready-toggle ${client.ready ? "checked" : ""}`}>
@@ -92,7 +96,7 @@ export default function Game({ clientId, token }: GameProps) {
       {!hasStarted && (
         <button
           onClick={onStartClick}
-          disabled={clients.some((c) => !c.ready)}
+          disabled={clientStates.some((c) => !c.ready)}
           className="start-button"
         >
           Start

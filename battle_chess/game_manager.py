@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import chess.engine
 from chess import (
@@ -132,7 +133,7 @@ class GameManager:
         if self.active_games[client_id].is_checkmate():
             # TODO: Handle player loss
             print(f"Checkmate against {client_id}")
-            ...
+            return
 
         self.turn_count[client_id] -= 1
 
@@ -164,15 +165,30 @@ class GameManager:
 
     def get_game_state(self):
         state = {
+            # Extra game attributes can be added here
             "started": self.started,
-            "clients": {
-                id: {
-                    # Extra attributes can be added here
-                    "fen": game.fen(),
-                    "ready": self.ready_states[id],
-                }
-                for id, game in self.active_games.items()
-            },
+            "turnTime": self.turn_time,
+            "clients": {},
         }
+
+        # Add state for each client
+        for id, game in self.active_games.items():
+            client_state = {
+                # Extra client attributes can be added here
+                "fen": game.fen(),
+                "ready": self.ready_states[id],
+            }
+
+            # Move time is sent as a timestamp since epoch,
+            # but the time remaining on the TimerHandle is not since epoch,
+            # so we calculate the remaining time and add it to the current time
+            move_time_remaining = (
+                self.move_timer_handles[id].when() - self._loop.time()
+                if self.move_timer_handles.get(id)
+                else 0.0
+            )
+            client_state["moveTime"] = time.time() + move_time_remaining
+
+            state["clients"][id] = client_state
 
         return state

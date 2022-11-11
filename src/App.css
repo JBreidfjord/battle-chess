@@ -57,10 +57,6 @@
   display: flex;
 }
 
-.Board {
-  padding: 2em;
-}
-
 .board-with-toggle {
   display: flex;
   flex-direction: column;

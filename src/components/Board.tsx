@@ -1,8 +1,11 @@
+import "./Board.css";
+
 import { Chessboard, CustomPieces } from "react-chessboard";
-import { ClientMessage, Move } from "../types";
+import { ClientMessage, ClientState, Move } from "../types";
 import { useEffect, useState } from "react";
 
 import { Chess } from "chess.js";
+import MoveTimer from "./MoveTimer";
 import bB from "../assets/pieces/black_bishop.png";
 import bK from "../assets/pieces/black_king.png";
 import bN from "../assets/pieces/black_knight.png";
@@ -35,11 +38,18 @@ interface BoardProps {
   clientId: number;
   sendJsonMessage: (jsonMessage: ClientMessage) => void;
   isInteractive: boolean;
-  serverFen?: string;
+  state: ClientState;
+  maxTurnTime: number;
 }
 
-export default function Board({ clientId, sendJsonMessage, isInteractive, serverFen }: BoardProps) {
-  const [game, setGame] = useState(new Chess(serverFen));
+export default function Board({
+  clientId,
+  sendJsonMessage,
+  isInteractive,
+  state,
+  maxTurnTime,
+}: BoardProps) {
+  const [game, setGame] = useState(new Chess(state.fen));
 
   const makeMove = (move: Move) => {
     const gameCopy = new Chess(game.fen());
@@ -65,8 +75,8 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, server
   };
 
   useEffect(() => {
-    setGame(new Chess(serverFen));
-  }, [serverFen]);
+    setGame(new Chess(state.fen));
+  }, [state.fen]);
 
   const customPieces = () => {
     const pieceImages: CustomPieces = {};
@@ -90,16 +100,21 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, server
 
   return (
     <div className="Board">
-      <Chessboard
-        id={clientId}
-        position={game.fen()}
-        arePiecesDraggable={isInteractive}
-        onPieceDrop={onDrop}
-        showBoardNotation={false}
-        customDarkSquareStyle={{ backgroundColor: "#464D5E" }}
-        customLightSquareStyle={{ backgroundColor: "#E6EAD7" }}
-        customPieces={customPieces()}
-      />
+      <div className="piece-queue" style={{ width: "100%", height: "1em" }} />
+      <div className="piece-queue-countdown" style={{ width: "100%", height: "1em" }} />
+      <MoveTimer time={state.moveTime} maxTime={maxTurnTime} />
+      <div className="Board__chessboard">
+        <Chessboard
+          id={clientId}
+          position={game.fen()}
+          arePiecesDraggable={isInteractive}
+          onPieceDrop={onDrop}
+          showBoardNotation={false}
+          customDarkSquareStyle={{ backgroundColor: "#464D5E" }}
+          customLightSquareStyle={{ backgroundColor: "#E6EAD7" }}
+          customPieces={customPieces()}
+        />
+      </div>
     </div>
   );
 }

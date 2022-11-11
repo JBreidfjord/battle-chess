@@ -165,6 +165,7 @@ class GameManager:
     def get_game_state(self):
         state = {
             "started": self.started,
+            "turnTime": self.turn_time,
             "clients": {
                 id: {
                     # Extra attributes can be added here

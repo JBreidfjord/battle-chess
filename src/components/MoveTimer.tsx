@@ -1,11 +1,12 @@
 interface MoveTimerProps {
   time: number;
+  maxTime: number;
 }
 
-export default function MoveTimer({ time }: MoveTimerProps) {
+export default function MoveTimer({ time, maxTime }: MoveTimerProps) {
   const fillStyle = {
     backgroundColor: "#44d492",
-    height: `${(time / 7.5) * 100}%`,
+    height: `${(time / maxTime) * 100}%`,
     width: "100%",
   };
 

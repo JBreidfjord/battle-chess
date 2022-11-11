@@ -25,6 +25,7 @@ export default function Game({ clientId, token }: GameProps) {
     defaultClientState,
   ]);
   const [hasStarted, setHasStarted] = useState(false);
+  const [turnTime, setTurnTime] = useState(7.5);
   const socketUrl = `ws://${window.location.hostname}:8000/ws/${clientId}?token=${token}`;
 
   const onMessage = (event: MessageEvent) => {
@@ -34,6 +35,10 @@ export default function Game({ clientId, token }: GameProps) {
 
     if (message["started"]) {
       setHasStarted(true);
+    }
+
+    if (message["turnTime"] && message["turnTime"] !== turnTime) {
+      setTurnTime(message["turnTime"]);
     }
 
     const newStates = [];
@@ -71,6 +76,7 @@ export default function Game({ clientId, token }: GameProps) {
               sendJsonMessage={sendJsonMessage as any}
               isInteractive={hasStarted && client.id === clientId}
               state={client}
+              maxTurnTime={turnTime}
             />
             {!hasStarted && (
               <div className={`ready-toggle ${client.ready ? "checked" : ""}`}>

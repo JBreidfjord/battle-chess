@@ -39,9 +39,16 @@ interface BoardProps {
   sendJsonMessage: (jsonMessage: ClientMessage) => void;
   isInteractive: boolean;
   state: ClientState;
+  maxTurnTime: number;
 }
 
-export default function Board({ clientId, sendJsonMessage, isInteractive, state }: BoardProps) {
+export default function Board({
+  clientId,
+  sendJsonMessage,
+  isInteractive,
+  state,
+  maxTurnTime,
+}: BoardProps) {
   const [game, setGame] = useState(new Chess(state.fen));
 
   const makeMove = (move: Move) => {
@@ -93,7 +100,9 @@ export default function Board({ clientId, sendJsonMessage, isInteractive, state 
 
   return (
     <div className="Board">
-      <MoveTimer time={state.moveTime} />
+      <div className="piece-queue" style={{ width: "100%", height: "1em" }} />
+      <div className="piece-queue-countdown" style={{ width: "100%", height: "1em" }} />
+      <MoveTimer time={state.moveTime} maxTime={maxTurnTime} />
       <div className="Board__chessboard">
         <Chessboard
           id={clientId}

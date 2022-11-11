@@ -3,5 +3,15 @@ interface MoveTimerProps {
 }
 
 export default function MoveTimer({ time }: MoveTimerProps) {
-  return <div className="move-timer">{time}</div>;
+  const fillStyle = {
+    backgroundColor: "#44d492",
+    height: `${(time / 7.5) * 100}%`,
+    width: "100%",
+  };
+
+  return (
+    <div className="move-timer">
+      <div style={fillStyle} />
+    </div>
+  );
 }

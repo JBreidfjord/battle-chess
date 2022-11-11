@@ -4,8 +4,6 @@
   grid-template-areas:
     "x queue queue-countdown"
     "move-timer board board";
-
-  border: 1px solid #fff;
 }
 
 .Board__chessboard {
@@ -14,6 +12,10 @@
 
 .move-timer {
   grid-area: move-timer;
+  width: 1em;
+  border: 1px solid #fff;
+  display: flex;
+  align-items: flex-end;
 }
 
 .piece-queue {

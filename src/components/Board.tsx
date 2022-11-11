@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 
 import { Chess } from "chess.js";
 import MoveTimer from "./MoveTimer";
+import PieceQueue from "./PieceQueue";
+import PieceQueueCountdown from "./PieceQueueCountdown";
 import bB from "../assets/pieces/black_bishop.png";
 import bK from "../assets/pieces/black_king.png";
 import bN from "../assets/pieces/black_knight.png";
@@ -100,8 +102,8 @@ export default function Board({
 
   return (
     <div className="Board">
-      <div className="piece-queue" style={{ width: "100%", height: "1em" }} />
-      <div className="piece-queue-countdown" style={{ width: "100%", height: "1em" }} />
+      <PieceQueue />
+      <PieceQueueCountdown />
       <MoveTimer time={state.moveTime} maxTime={maxTurnTime} />
       <div className="Board__chessboard">
         <Chessboard

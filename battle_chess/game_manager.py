@@ -60,14 +60,23 @@ class GameManager:
     def move(self, client_id: str, move: dict[str, str]):
         # Check for input validity
         if not self.active_games.get(client_id):
-            print(f"No game found for client_id: {client_id}")
+            print(f"WARN: No game found for client_id: {client_id}")
             return
         if not move.get("from") or not move.get("to"):
-            print(f"Invalid move: {move} for client_id: {client_id}")
+            print(f"WARN: Invalid move: {move} for client_id: {client_id}")
             return
 
-        # TODO: Handle check for promotion
         moveObj = Move.from_uci(f"{move['from']}{move['to']}")
+
+        # Check for promotion
+        piece_to_move = self.active_games[client_id].piece_at(parse_square(move["from"]))
+        if not piece_to_move:
+            print(f"WARN: No piece found at {move['from']} for client_id: {client_id}")
+            return
+        dest_square = parse_square(move["to"])
+        # If pawn is moving to the last rank, move is promotion
+        if piece_to_move.piece_type == PAWN and dest_square in range(56, 64):
+            moveObj.promotion = QUEEN
 
         possible_moves = self.active_games[client_id].legal_moves
         if moveObj not in possible_moves:
@@ -77,7 +86,7 @@ class GameManager:
         self.move_timer_handles[client_id].cancel()
 
         # Check if move is a capture and therefore removes a piece
-        removed_piece = self.active_games[client_id].piece_at(parse_square(move["to"]))
+        removed_piece = self.active_games[client_id].piece_at(dest_square)
         if removed_piece is not None:
             # Add piece to other player's queue
             if removed_piece.piece_type != PAWN and removed_piece.piece_type != KING:

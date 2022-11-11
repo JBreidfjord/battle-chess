@@ -15,6 +15,7 @@ const defaultClientState: ClientState = {
   fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   ready: false,
   moveTime: 0.0,
+  queue: [],
 };
 
 export default function Game({ clientId, token }: GameProps) {

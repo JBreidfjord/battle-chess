@@ -20,6 +20,9 @@
 
 .piece-queue {
   grid-area: queue;
+  display: flex;
+  border: 1px solid #fff;
+  height: 64px;
 }
 
 .piece-queue-countdown {

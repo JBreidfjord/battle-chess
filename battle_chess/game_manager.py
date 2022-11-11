@@ -170,6 +170,7 @@ class GameManager:
                     # Extra attributes can be added here
                     "fen": game.fen(),
                     "ready": self.ready_states[id],
+                    "moveTime": self.move_timer_handles[id].when() - self._loop.time(),
                 }
                 for id, game in self.active_games.items()
             },

@@ -1,10 +1,10 @@
 import "./Board.css";
 
+import { Chess, Square } from "chess.js";
 import { Chessboard, CustomPieces } from "react-chessboard";
 import { ClientMessage, ClientState, Move } from "../types";
 import { useEffect, useState } from "react";
 
-import { Chess } from "chess.js";
 import MoveTimer from "./MoveTimer";
 import bB from "../assets/pieces/black_bishop.png";
 import bK from "../assets/pieces/black_king.png";
@@ -62,10 +62,13 @@ export default function Board({
   };
 
   const onDrop = (src: string, dest: string) => {
+    // Promote if piece is a pawn and is on the last rank
+    const isPromotion = game.get(src as Square)?.type === "p" && dest[1] === "8";
+
     const move = makeMove({
       from: src,
       to: dest,
-      // promotion: "q", // always promote to a queen for simplicity
+      promotion: isPromotion ? "q" : undefined, // always promote to a queen for simplicity
     });
 
     // illegal move

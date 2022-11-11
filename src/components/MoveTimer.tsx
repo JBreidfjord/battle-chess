@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 interface MoveTimerProps {
   time: number;
   maxTime: number;
@@ -51,20 +53,29 @@ const getGradientColor = (pct: number) => {
   return gradientColors[index];
 };
 
-// TODO: Handle timer interpolation or calculate time client-side instead
-
 export default function MoveTimer({ time, maxTime }: MoveTimerProps) {
-  const pct = time / maxTime;
-  const fillStyle = {
-    backgroundColor: getGradientColor(pct),
-    height: `${pct * 100}%`,
-    width: "100%",
-    transition: `height ${pct > 0.9 ? "0.1" : "0.5"}s`,
-  };
+  const [pct, setPct] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPct(() => {
+        const remainingTime = time - Date.now() / 1000;
+        const pct = remainingTime / maxTime;
+        return pct;
+      });
+    }, 1000 / 60); // 60 fps
+    return () => clearInterval(interval);
+  }, [time, maxTime]);
 
   return (
     <div className="move-timer">
-      <div style={fillStyle} />
+      <div
+        style={{
+          backgroundColor: getGradientColor(pct),
+          height: `${pct * 100}%`,
+          width: "100%",
+        }}
+      />
     </div>
   );
 }

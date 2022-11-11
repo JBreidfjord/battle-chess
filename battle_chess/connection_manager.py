@@ -14,7 +14,7 @@ class ConnectionManager:
         self.game_managers: dict[str, GameManager] = {}  # dict[token, GameManager]
 
         self._loop = asyncio.get_event_loop()
-        self._update_time = 1  # seconds
+        self._update_time = 0.5  # seconds
         self._update_handle: asyncio.TimerHandle | None = None
 
     async def connect(self, websocket: WebSocket, token: str, client_id: str):

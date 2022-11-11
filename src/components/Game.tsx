@@ -1,3 +1,5 @@
+import { ClientState, StateUpdate } from "../types";
+
 import Board from "./Board";
 import { stringToInt } from "../utils";
 import { useState } from "react";
@@ -8,18 +10,19 @@ interface GameProps {
   token: string;
 }
 
-const defaultClient = {
+const defaultClientState: ClientState = {
   id: "",
   fen: "",
   ready: false,
+  moveTime: 0.0,
 };
 
 export default function Game({ clientId, token }: GameProps) {
-  const [clients, setClients] = useState([
-    { id: clientId, fen: "", ready: false },
-    defaultClient,
-    defaultClient,
-    defaultClient,
+  const [clientStates, setClientStates] = useState([
+    { id: clientId, fen: "", ready: false, moveTime: 0.0 },
+    defaultClientState,
+    defaultClientState,
+    defaultClientState,
   ]);
   const [hasStarted, setHasStarted] = useState(false);
   const socketUrl = `ws://${window.location.hostname}:8000/ws/${clientId}?token=${token}`;
@@ -33,18 +36,13 @@ export default function Game({ clientId, token }: GameProps) {
       setHasStarted(true);
     }
 
-    const newClients = [];
-    for (const [id, client] of Object.entries(message["clients"])) {
+    const newStates = [];
+    for (const [id, state] of Object.entries<StateUpdate>(message["clients"])) {
+      const newState = { id, ...state };
       // Check for ID match so our client is at the start of the array
-      if (id === clientId) {
-        // Insert at start of array
-        newClients.unshift({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
-      } else {
-        // Insert at end of array
-        newClients.push({ id, fen: (client as any)["fen"], ready: (client as any)["ready"] });
-      }
+      id === clientId ? newStates.unshift(newState) : newStates.push(newState);
     }
-    setClients(newClients);
+    setClientStates(newStates);
   };
 
   const { sendMessage, sendJsonMessage } = useWebSocket(socketUrl, {
@@ -65,7 +63,7 @@ export default function Game({ clientId, token }: GameProps) {
   return (
     <div className="Game">
       <div className="board-container">
-        {clients.map((client, index) => (
+        {clientStates.map((client, index) => (
           <div className="board-with-toggle" key={client.id || index}>
             <Board
               key={client.id || index}
@@ -92,7 +90,7 @@ export default function Game({ clientId, token }: GameProps) {
       {!hasStarted && (
         <button
           onClick={onStartClick}
-          disabled={clients.some((c) => !c.ready)}
+          disabled={clientStates.some((c) => !c.ready)}
           className="start-button"
         >
           Start

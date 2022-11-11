@@ -8,5 +8,17 @@ export interface ClientMessage {
   move: Move;
 }
 
-export interface ServerMessage {
+export interface ClientState {
+  id: string;
+  fen: string;
+  ready: boolean;
+  moveTime: number;
 }
+
+export interface StateUpdate {
+  fen: string;
+  ready: boolean;
+  moveTime: number;
+}
+
+export interface ServerMessage {}

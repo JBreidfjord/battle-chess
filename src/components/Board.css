@@ -1,0 +1,25 @@
+.Board {
+  padding: 2em;
+  display: grid;
+  grid-template-areas:
+    "x queue queue-countdown"
+    "move-timer board board";
+
+  border: 1px solid #fff;
+}
+
+.Board__chessboard {
+  grid-area: board;
+}
+
+.move-timer {
+  grid-area: move-timer;
+}
+
+.piece-queue {
+  grid-area: queue;
+}
+
+.piece-queue-countdown {
+  grid-area: queue-countdown;
+}

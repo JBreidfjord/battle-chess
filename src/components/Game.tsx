@@ -12,14 +12,14 @@ interface GameProps {
 
 const defaultClientState: ClientState = {
   id: "",
-  fen: "",
+  fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   ready: false,
   moveTime: 0.0,
 };
 
 export default function Game({ clientId, token }: GameProps) {
   const [clientStates, setClientStates] = useState([
-    { id: clientId, fen: "", ready: false, moveTime: 0.0 },
+    { ...defaultClientState, id: clientId },
     defaultClientState,
     defaultClientState,
     defaultClientState,
@@ -38,7 +38,7 @@ export default function Game({ clientId, token }: GameProps) {
 
     const newStates = [];
     for (const [id, state] of Object.entries<StateUpdate>(message["clients"])) {
-      const newState = { id, ...state };
+      const newState = { ...state, id };
       // Check for ID match so our client is at the start of the array
       id === clientId ? newStates.unshift(newState) : newStates.push(newState);
     }
@@ -70,7 +70,7 @@ export default function Game({ clientId, token }: GameProps) {
               clientId={stringToInt(client.id) || -1}
               sendJsonMessage={sendJsonMessage as any}
               isInteractive={hasStarted && client.id === clientId}
-              serverFen={client.fen || undefined}
+              state={client}
             />
             {!hasStarted && (
               <div className={`ready-toggle ${client.ready ? "checked" : ""}`}>

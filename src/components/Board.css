@@ -4,12 +4,19 @@
   grid-template-areas:
     "x queue queue-countdown"
     "move-timer board board";
-  /* grid-template-columns: 3% 70% 27%; */
-  /* grid-template-columns: auto 5fr 1fr; */
+  grid-template-columns: auto 5fr 1fr;
 }
 
 .Board__chessboard {
   grid-area: board;
+}
+
+.opponent-boards {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-auto-columns: 0.5fr;
+  justify-content: center;
 }
 
 .move-timer {

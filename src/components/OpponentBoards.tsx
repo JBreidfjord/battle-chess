@@ -1,5 +1,6 @@
 import Board from "./Board";
 import { ClientState } from "../types";
+import ReadyToggle from "./ReadyToggle";
 import { stringToInt } from "../utils";
 
 interface OpponentBoardsProps {
@@ -23,14 +24,7 @@ export default function OpponentBoards({
             state={state}
             maxTurnTime={maxTurnTime}
           />
-          {!hasStarted && (
-            <div className={`ready-toggle ${state.ready ? "checked" : ""}`}>
-              <label>
-                {state.ready ? "Ready" : "Not Ready"}
-                <input type="checkbox" disabled checked={state.ready} />
-              </label>
-            </div>
-          )}
+          <ReadyToggle hasStarted={hasStarted} ready={state.ready} />
         </div>
       ))}
     </div>

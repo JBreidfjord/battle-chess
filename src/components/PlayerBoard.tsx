@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import Board from "./Board";
 import { Chess } from "chess.js";
+import ReadyToggle from "./ReadyToggle";
 
 interface PlayerBoardProps {
   clientId: number;
@@ -50,10 +51,6 @@ export default function PlayerBoard({
     return true;
   };
 
-  const onReadyToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    sendMessage(e.target.checked ? "ready" : "unready");
-  };
-
   useEffect(() => {
     setGame(new Chess(state.fen));
   }, [state.fen]);
@@ -68,14 +65,12 @@ export default function PlayerBoard({
         state={state}
         maxTurnTime={maxTurnTime}
       />
-      {!hasStarted && (
-        <div className={`ready-toggle ${state.ready ? "checked" : ""}`}>
-          <label className="interactive">
-            {state.ready ? "Ready" : "Not Ready"}
-            <input type="checkbox" checked={state.ready} onChange={onReadyToggle} />
-          </label>
-        </div>
-      )}
+      <ReadyToggle
+        hasStarted={hasStarted}
+        ready={state.ready}
+        sendMessage={sendMessage}
+        isInteractive
+      />
     </div>
   );
 }

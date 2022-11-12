@@ -1,6 +1,7 @@
 import { ClientState, StateUpdate } from "../types";
 
-import Board from "./Board";
+import OpponentBoards from "./OpponentBoards";
+import PlayerBoard from "./PlayerBoard";
 import { stringToInt } from "../utils";
 import { useState } from "react";
 import useWebSocket from "react-use-websocket";
@@ -61,37 +62,22 @@ export default function Game({ clientId, token }: GameProps) {
     sendMessage("start");
   };
 
-  const onReadyToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    sendMessage(e.target.checked ? "ready" : "unready");
-  };
-
   return (
     <div className="Game">
       <div className="board-container">
-        {clientStates.map((client, index) => (
-          <div className="board-with-toggle" key={client.id || index}>
-            <Board
-              key={client.id || index}
-              clientId={stringToInt(client.id) || -1}
-              sendJsonMessage={sendJsonMessage as any}
-              isInteractive={hasStarted && client.id === clientId}
-              state={client}
-              maxTurnTime={turnTime}
-            />
-            {!hasStarted && (
-              <div className={`ready-toggle ${client.ready ? "checked" : ""}`}>
-                <label className={client.id === clientId ? "interactive" : ""}>
-                  {client.ready ? "Ready" : "Not Ready"}
-                  {client.id === clientId ? (
-                    <input type="checkbox" checked={client.ready} onChange={onReadyToggle} />
-                  ) : (
-                    <input type="checkbox" disabled checked={client.ready} />
-                  )}
-                </label>
-              </div>
-            )}
-          </div>
-        ))}
+        <PlayerBoard
+          clientId={stringToInt(clientId)}
+          sendJsonMessage={sendJsonMessage as any}
+          sendMessage={sendMessage}
+          hasStarted={hasStarted}
+          state={clientStates[0]}
+          maxTurnTime={turnTime}
+        />
+        <OpponentBoards
+          clientStates={clientStates.slice(1)}
+          hasStarted={hasStarted}
+          maxTurnTime={turnTime}
+        />
       </div>
       {!hasStarted && (
         <button

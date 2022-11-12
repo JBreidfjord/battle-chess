@@ -111,8 +111,16 @@ class GameManager:
             print(f"No game found for client_id: {client_id}")
             return
 
+        # If side to move is white, the player's timer ran out
+        # and the turn should be given to the AI / black
         if self.active_games[client_id].turn == WHITE:
-            print("WARN: AI tried moving on White turn")
+            # Early check for check to handle the case where
+            # the player was already in check and their timer ran out
+            if self.active_games[client_id].is_check():
+                # TODO: Handle player loss
+                print(f"Player {client_id} lost turn in check")
+                return
+
             self.active_games[client_id].turn = BLACK
             # Clear move stack to prevent engine errors
             self.active_games[client_id].clear_stack()

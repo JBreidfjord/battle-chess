@@ -23,21 +23,21 @@ function App() {
           <h1>Battle Chess</h1>
           <p>This is battle chess. Rules:</p>
           <ul>
-            <li>Normal chess rules apply</li>
-            <li>Each player has a limited amount of time to make each move</li>
-            <li>
+            <p>Normal chess rules apply</p>
+            <p>Each player has a limited amount of time to make each move</p>
+            <p>
               When a piece is captured, AI pieces will be sent to every player you're up against
-            </li>
-            <li>The pieces sent to enemy players depends on what was captured</li>
-            <li>
+            </p>
+            <p>The pieces sent to enemy players depends on what was captured</p>
+            <p>
               The piece sent will have a rank one less than the piece captured, for example a queen
               captured sends a rook
-            </li>
-            <li>
+            </p>
+            <p>
               If someone beats their opposing AI a queen will be sent to the enemy players and their
               board will be reset
-            </li>
-            <li>Last person standing wins</li>
+            </p>
+            <p>Last person standing wins</p>
           </ul>
           <div className="room-form">
             <label>

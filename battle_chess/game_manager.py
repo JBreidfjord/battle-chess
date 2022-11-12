@@ -107,6 +107,15 @@ class GameManager:
             self.active_games[client_id].reset_board()
 
     async def ai_move(self, client_id: str):
+        # ### UNCOMMENT TO DISABLE AI MOVES FOR DEVELOPMENT ###
+        # self.active_games[client_id].turn = WHITE
+        # self.turn_count[client_id] -= 1
+        # if self.turn_count[client_id] == 0:
+        #     self.spawn_piece(client_id)
+        #     self.turn_count[client_id] = 3
+        # await self.set_move_timer(client_id)
+        # return
+
         if not self.active_games.get(client_id):
             print(f"No game found for client_id: {client_id}")
             return

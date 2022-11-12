@@ -4,6 +4,8 @@
   grid-template-areas:
     "x queue queue-countdown"
     "move-timer board board";
+  /* grid-template-columns: 3% 70% 27%; */
+  /* grid-template-columns: auto 5fr 1fr; */
 }
 
 .Board__chessboard {
@@ -12,7 +14,7 @@
 
 .move-timer {
   grid-area: move-timer;
-  width: 1em;
+  min-width: 1em;
   border: 1px solid #fff;
   display: flex;
   align-items: flex-end;
@@ -22,9 +24,16 @@
   grid-area: queue;
   display: flex;
   border: 1px solid #fff;
-  height: 64px;
+  max-height: 64px;
 }
 
 .piece-queue-countdown {
   grid-area: queue-countdown;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.piece-queue-countdown .red {
+  color: #fa233e;
 }

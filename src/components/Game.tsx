@@ -1,3 +1,5 @@
+import "./Game.css";
+
 import { ClientState, StateUpdate } from "../types";
 
 import OpponentBoards from "./OpponentBoards";

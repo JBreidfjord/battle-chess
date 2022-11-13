@@ -15,9 +15,19 @@ interface BoardProps {
   isInteractive?: boolean;
   state: ClientState;
   maxTurnTime: number;
+  tightLayout?: boolean;
+  numBoards?: number;
 }
 
-export default function Board({ clientId, onDrop, isInteractive, state, maxTurnTime }: BoardProps) {
+export default function Board({
+  clientId,
+  onDrop,
+  isInteractive,
+  state,
+  maxTurnTime,
+  tightLayout,
+  numBoards,
+}: BoardProps) {
   const [boardWidth, setBoardWidth] = useState(0);
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -29,8 +39,8 @@ export default function Board({ clientId, onDrop, isInteractive, state, maxTurnT
 
   return (
     <div className="Board">
-      <PieceQueue queue={state.queue} />
-      <PieceQueueCountdown count={state.queueCountdown} />
+      <PieceQueue queue={state.queue} size={boardWidth / 8} />
+      <PieceQueueCountdown count={state.queueCountdown} tightLayout={tightLayout} />
       <MoveTimer time={state.moveTime} maxTime={maxTurnTime} />
       <div className="Board__chessboard" ref={boardRef}>
         <Chessboard

@@ -16,13 +16,14 @@ const pieceImageMap: Record<number, string> = {
 
 interface PieceQueueProps {
   queue: number[];
+  size: number;
 }
 
-export default function PieceQueue({ queue }: PieceQueueProps) {
+export default function PieceQueue({ queue, size }: PieceQueueProps) {
   return (
     <div className="piece-queue">
       {queue.reverse().map((piece, i) => {
-        return <img key={i} src={pieceImageMap[piece]} alt="piece" />;
+        return <img key={i} src={pieceImageMap[piece]} alt="piece" width={size} height={size} />;
       })}
     </div>
   );

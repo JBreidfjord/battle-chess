@@ -14,11 +14,21 @@ export default function OpponentBoards({
   hasStarted,
   maxTurnTime,
 }: OpponentBoardsProps) {
+  if (clientStates.length === 0) {
+    return null;
+  }
+
   return (
     <div className="opponent-boards">
       {clientStates.map((state, i) => (
         <div className="board-with-toggle" key={i}>
-          <Board clientId={stringToInt(state.id)} state={state} maxTurnTime={maxTurnTime} />
+          <Board
+            clientId={stringToInt(state.id)}
+            state={state}
+            maxTurnTime={maxTurnTime}
+            numBoards={clientStates.length}
+            tightLayout
+          />
           <ReadyToggle hasStarted={hasStarted} ready={state.ready} />
         </div>
       ))}

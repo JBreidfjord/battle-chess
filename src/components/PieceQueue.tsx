@@ -22,9 +22,12 @@ interface PieceQueueProps {
 export default function PieceQueue({ queue, size }: PieceQueueProps) {
   return (
     <div className="piece-queue">
-      {queue.reverse().map((piece, i) => {
-        return <img key={i} src={pieceImageMap[piece]} alt="piece" width={size} height={size} />;
-      })}
+      {queue
+        .slice(0, 5)
+        .reverse()
+        .map((piece, i) => {
+          return <img key={i} src={pieceImageMap[piece]} alt="piece" width={size} height={size} />;
+        })}
     </div>
   );
 }

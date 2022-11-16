@@ -4,6 +4,7 @@
     "x queue queue-countdown"
     "move-timer board board";
   grid-template-columns: auto 5fr 3fr;
+  grid-template-rows: 1fr 8fr;
   width: 100%;
   max-width: 75vh;
 }
@@ -38,7 +39,7 @@
 .piece-queue {
   grid-area: queue;
   display: flex;
-  border: 1px solid #fff;
+  justify-content: flex-end;
 }
 
 .piece-queue-countdown {
@@ -46,7 +47,6 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  border: 1px solid #fff;
 }
 
 .piece-queue-countdown .red {

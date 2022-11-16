@@ -58,7 +58,6 @@ export default function PlayerBoard({
   return (
     <div className="board-with-toggle">
       <Board
-        boardWidth={window.innerWidth / 3}
         clientId={clientId}
         onDrop={onDrop}
         isInteractive={hasStarted}

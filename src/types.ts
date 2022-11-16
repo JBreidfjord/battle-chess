@@ -12,6 +12,8 @@ export interface StateUpdate {
   fen: string;
   ready: boolean;
   moveTime: number;
+  queue: number[];
+  queueCountdown: number;
 }
 
 export type ClientState = StateUpdate & {

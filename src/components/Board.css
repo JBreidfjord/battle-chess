@@ -1,18 +1,36 @@
 .Board {
-  padding: 2em;
   display: grid;
   grid-template-areas:
     "x queue queue-countdown"
     "move-timer board board";
+  grid-template-columns: auto 5fr 3fr;
+  grid-template-rows: 1fr 8fr;
+  width: 100%;
+  max-width: 75vh;
 }
 
 .Board__chessboard {
   grid-area: board;
 }
 
+.opponent-boards {
+  width: 100%;
+  max-width: 75vh;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-rows: 1fr min-content;
+  grid-auto-flow: column;
+  grid-auto-columns: 0.5fr 0.5fr;
+  justify-content: center;
+}
+
+.opponent-boards .Board {
+  grid-template-columns: auto 5fr 1fr;
+}
+
 .move-timer {
   grid-area: move-timer;
-  width: 1em;
+  min-width: 1em;
   border: 1px solid #fff;
   display: flex;
   align-items: flex-end;
@@ -20,8 +38,17 @@
 
 .piece-queue {
   grid-area: queue;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .piece-queue-countdown {
   grid-area: queue-countdown;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.piece-queue-countdown .red {
+  color: #fa233e;
 }

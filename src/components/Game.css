@@ -5,13 +5,16 @@
 }
 
 .board-container {
+  width: 100%;
   display: flex;
+  gap: 1em;
 }
 
 .board-with-toggle {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .ready-toggle {
@@ -19,6 +22,10 @@
   font-size: 1.5em;
   margin: 1em;
   color: #fa233e;
+}
+
+.opponent-boards .ready-toggle {
+  font-size: 1em;
 }
 
 .ready-toggle.checked {

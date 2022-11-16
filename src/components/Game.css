@@ -10,37 +10,8 @@
   gap: 1em;
 }
 
-.board-with-toggle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.ready-toggle {
-  text-transform: uppercase;
-  font-size: 1.5em;
-  margin: 1em;
-  color: #fa233e;
-}
-
-.opponent-boards .ready-toggle {
-  font-size: 1em;
-}
-
-.ready-toggle.checked {
-  color: #44d492;
-}
-
-.ready-toggle .interactive {
-  cursor: pointer;
-}
-
-.ready-toggle input[type="checkbox"] {
-  display: none;
-}
-
 .start-button {
+  margin: 1em;
   border: none;
   font-size: 1.5em;
   text-transform: uppercase;

@@ -21,16 +21,14 @@ export default function OpponentBoards({
   return (
     <div className="opponent-boards">
       {clientStates.map((state, i) => (
-        <div className="board-with-toggle" key={i}>
-          <Board
-            clientId={stringToInt(state.id)}
-            state={state}
-            maxTurnTime={maxTurnTime}
-            numBoards={clientStates.length}
-            tightLayout
-          />
-          <ReadyToggle hasStarted={hasStarted} ready={state.ready} />
-        </div>
+        <Board
+          key={i}
+          clientId={stringToInt(state.id)}
+          hasStarted={hasStarted}
+          state={state}
+          maxTurnTime={maxTurnTime}
+          tightLayout
+        />
       ))}
     </div>
   );

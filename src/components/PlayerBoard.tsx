@@ -56,20 +56,14 @@ export default function PlayerBoard({
   }, [state.fen]);
 
   return (
-    <div className="board-with-toggle">
-      <Board
-        clientId={clientId}
-        onDrop={onDrop}
-        isInteractive={hasStarted}
-        state={state}
-        maxTurnTime={maxTurnTime}
-      />
-      <ReadyToggle
-        hasStarted={hasStarted}
-        ready={state.ready}
-        sendMessage={sendMessage}
-        isInteractive
-      />
-    </div>
+    <Board
+      clientId={clientId}
+      onDrop={onDrop}
+      sendMessage={sendMessage}
+      isInteractive
+      hasStarted={hasStarted}
+      state={state}
+      maxTurnTime={maxTurnTime}
+    />
   );
 }
